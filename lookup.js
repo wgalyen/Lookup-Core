@@ -10,11 +10,25 @@ var path = require('path'),
 
 var lookup = {
 
-    // Default content directory where Markdown files are stored
-    contentDir: './content/',
-
-    // Toggle debug logging
-    debug: false,
+    // Config array that can be overridden
+    config: {
+        // The base URL of your site (allows you to use %base_url% in Markdown files)
+        base_url: '',
+        // The base URL of your images folder (allows you to use %image_url% in Markdown files)
+        image_url: '/images',
+        // Excerpt length (used in search)
+        excerpt_length: 400,
+        // The meta value by which to sort pages (value should be an integer)
+        // If this option is blank pages will be sorted alphabetically
+        page_sort_meta: 'sort',
+        // Should categories be sorted numerically (true) or alphabetically (false)
+        // If true category folders need to contain a "sort" file with an integer value
+        category_sort: true,
+        // Specify the path of your content folder where all your '.md' files are located
+        content_dir: './content/',
+        // Toggle debug logging
+        debug: false
+    },
 
     // Regex for page meta
     _metaRegex: /^\/\*([\s\S]*?)\*\//i,
@@ -61,19 +75,17 @@ var lookup = {
     },
 
     // Replace content variables in Markdown content
-    processVars: function(markdownContent, config) {
-        config = config || {};
-        if(typeof config.base_url !== 'undefined') markdownContent = markdownContent.replace(/\%base_url\%/g, config.base_url);
-        if (typeof config.image_url !== 'undefined') markdownContent = markdownContent.replace(/\%image_url\%/g, config.image_url);
+    processVars: function(markdownContent) {
+        if(typeof lookup.config.base_url !== 'undefined') markdownContent = markdownContent.replace(/\%base_url\%/g, lookup.config.base_url);
+        if (typeof lookup.config.image_url !== 'undefined') markdownContent = markdownContent.replace(/\%image_url\%/g, lookup.config.image_url);
         return markdownContent;
     },
 
     // Get a page
-    getPage: function(filePath, config) {
-        config = config || {};
+    getPage: function(filePath) {
         try {
             var file = fs.readFileSync(filePath),
-                slug = filePath.replace(lookup.contentDir, '').trim();
+                slug = filePath.replace(lookup.config.content_dir, '').trim();
 
             if(slug.indexOf('index.md') > -1){
                 slug = slug.replace('index.md', '');
@@ -82,29 +94,28 @@ var lookup = {
 
             var meta = lookup.processMeta(file.toString('utf-8')),
                 content = lookup.stripMeta(file.toString('utf-8'));
-            content = lookup.processVars(content, config);
+            content = lookup.processVars(content);
             var html = marked(content);
 
             return {
                 'slug': slug,
                 'title': meta.title ? meta.title : lookup.slugToTitle(slug),
                 'body': html,
-                'excerpt': _s.prune(_s.stripTags(_s.unescapeHTML(html)), config.excerpt_length)
+                'excerpt': _s.prune(_s.stripTags(_s.unescapeHTML(html)), (lookup.config.excerpt_length || 400))
             };
         }
         catch(e){
-            if(lookup.debug) console.log(e);
+            if(lookup.config.debug) console.log(e);
             return null;
         }
     },
 
     // Get a structured array of the contents of contentDir
-    getPages: function(activePageSlug, config) {
+    getPages: function(activePageSlug) {
         activePageSlug = activePageSlug || '';
-        config = config || {};
-        var page_sort_meta = config.page_sort_meta || '',
-            category_sort = config.category_sort || false,
-            files = glob.sync(lookup.contentDir +'**/*'),
+        var page_sort_meta = lookup.config.page_sort_meta || '',
+            category_sort = lookup.config.category_sort || false,
+            files = glob.sync(lookup.config.content_dir +'**/*'),
             filesProcessed = [];
 
         filesProcessed.push({
@@ -117,18 +128,18 @@ var lookup = {
         });
 
         files.forEach(function(filePath){
-            var shortPath = filePath.replace(lookup.contentDir, '').trim(),
+            var shortPath = filePath.replace(lookup.config.content_dir, '').trim(),
                 stat = fs.lstatSync(filePath);
 
             if(stat.isDirectory()){
                 var sort = 0;
                 if(category_sort){
                     try {
-                        var sortFile = fs.readFileSync(lookup.contentDir + shortPath +'/sort');
+                        var sortFile = fs.readFileSync(lookup.config.content_dir + shortPath +'/sort');
                         sort = parseInt(sortFile.toString('utf-8'), 10);
                     }
                     catch(e){
-                        if(lookup.debug) console.log(e);
+                        if(lookup.config.debug) console.log(e);
                     }
                 }
 
@@ -166,7 +177,7 @@ var lookup = {
                     });
                 }
                 catch(e){
-                    if(lookup.debug) console.log(e);
+                    if(lookup.config.debug) console.log(e);
                 }
             }
         });
@@ -180,9 +191,8 @@ var lookup = {
     },
 
     // Index and search contents
-    doSearch: function(query, config) {
-        config = config || {};
-        var files = glob.sync(lookup.contentDir +'**/*.md');
+    doSearch: function(query) {
+        var files = glob.sync(lookup.config.content_dir +'**/*.md');
         var idx = lunr(function(){
             this.field('title', { boost: 10 });
             this.field('body');
@@ -190,7 +200,7 @@ var lookup = {
 
         files.forEach(function(filePath){
             try {
-                var shortPath = filePath.replace(lookup.contentDir, '').trim(),
+                var shortPath = filePath.replace(lookup.config.content_dir, '').trim(),
                     file = fs.readFileSync(filePath);
 
                 var meta = lookup.processMeta(file.toString('utf-8'));
@@ -201,14 +211,14 @@ var lookup = {
                 });
             }
             catch(e){
-                if(lookup.debug) console.log(e);
+                if(lookup.config.debug) console.log(e);
             }
         });
 
         var results = idx.search(query),
             searchResults = [];
         results.forEach(function(result){
-            var page = lookup.getPage(lookup.contentDir + result.ref, config);
+            var page = lookup.getPage(lookup.config.content_dir + result.ref);
             page.excerpt = page.excerpt.replace(new RegExp('('+ query +')', 'gim'), '<span class="search-query">$1</span>');
             searchResults.push(page);
         });
