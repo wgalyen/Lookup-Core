@@ -1,0 +1,48 @@
+{
+  "name": "lookup-core",
+  "version": "0.1.0",
+  "description": "Core module for Lookup",
+  "author": "Warren Galyen <wgalyen@bellhelmets.com>",
+  "license": "MIT",
+  "keywords": [
+    "lookup",
+    "markdown",
+    "static",
+    "site",
+    "generator"
+  ],
+  "main": "lookup.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wgalyen/Lookup-Core.git"
+  },
+  "bugs": {
+    "url": "https://github.com/wgalyen/Lookup-Core/issues"
+  },
+  "homepage": "https://github.com/wgalyen/Lookup-Core",
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://raw.githubusercontent.com/wgalyen/Lookup-Core/master/LICENSE"
+    }
+  ],
+  "engines": {
+    "node": "~0.10.0"
+  },
+  "dependencies": {
+    "glob": "^4.0.0",
+    "lunr": "^0.5.3",
+    "marked": "^0.3.2",
+    "moment": "^2.6.0",
+    "underscore": "^1.6.0",
+    "underscore.string": "^2.3.3",
+    "validator": "^3.13.0"
+  },
+  "devDependencies": {
+    "chai": "^1.9.1",
+    "mocha": "^1.20.1"
+  }
+}
