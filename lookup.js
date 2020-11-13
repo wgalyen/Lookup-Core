@@ -180,7 +180,8 @@ var lookup = {
     },
 
     // Index and search contents
-    doSearch: function(query) {
+    doSearch: function(query, config) {
+        config = config || {};
         var files = glob.sync(lookup.contentDir +'**/*.md');
         var idx = lunr(function(){
             this.field('title', { boost: 10 });
@@ -204,7 +205,15 @@ var lookup = {
             }
         });
 
-        return idx.search(query);
+        var results = idx.search(query),
+            searchResults = [];
+        results.forEach(function(result){
+            var page = lookup.getPage(lookup.contentDir + result.ref, config);
+            page.excerpt = page.excerpt.replace(new RegExp('('+ query +')', 'gim'), '<span class="search-query">$1</span>');
+            searchResults.push(page);
+        });
+
+        return searchResults;
     }
 
 };
