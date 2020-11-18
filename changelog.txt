@@ -1,5 +1,8 @@
 *** Lookup Core Changelog ***
 
+version 0.3.0
+* [New] Add support for symlinks in content dir
+
 version 0.2.0
 * [New] Added formatting to doSearch results
 * [Changed] Move config options to overridable array
