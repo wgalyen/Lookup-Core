@@ -131,6 +131,10 @@ var lookup = {
             var shortPath = filePath.replace(lookup.config.content_dir, '').trim(),
                 stat = fs.lstatSync(filePath);
 
+            if (stat.isSymbolicLink()) {
+                stat = fs.lstatSync(fs.readlinkSync(filePath));
+            }
+
             if(stat.isDirectory()){
                 var sort = 0;
 
