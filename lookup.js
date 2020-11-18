@@ -133,6 +133,13 @@ var lookup = {
 
             if(stat.isDirectory()){
                 var sort = 0;
+
+                // ignore directories that have an ignore file under it
+                var ignoreFile = lookup.config.content_dir + shortPath + '/ignore';
+                if (fs.existsSync(ignoreFile) && fs.lstatSync(ignoreFile).isFole()) {
+                    return true;
+                }
+
                 if(category_sort){
                     try {
                         var sortFile = fs.readFileSync(lookup.config.content_dir + shortPath +'/sort');
