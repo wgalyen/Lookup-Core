@@ -24,7 +24,7 @@ delint:
 
 	# JSHint
 	./node_modules/jshint/bin/jshint \
-		lookup.js                      \
+		lib/                           \
 		test/;                         \
 
 .PHONY: unit

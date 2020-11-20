@@ -11,7 +11,7 @@
     "site",
     "generator"
   ],
-  "main": "lookup.js",
+  "main": "lib/lookup.js",
   "scripts": {
     "test": "make test"
   },

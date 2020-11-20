@@ -4,7 +4,7 @@
 var chai = require('chai'),
     should = chai.should(),
     expect = chai.expect,
-    lookup = require('../lookup');
+    lookup = require('../lib/lookup');
 
 chai.config.truncateThreshold = 0;
 
