@@ -17,15 +17,18 @@ install:
 	npm install;
 
 .PHONY: test
-test:
-
-	# Run Tests
-	./node_modules/mocha/bin/mocha --reporter spec;
+test: delint unit
 
 .PHONY: delint
 delint:
 
 	# JSHint
 	./node_modules/jshint/bin/jshint \
-		raneto.js                      \
+		lookup.js                      \
 		test/;                         \
+
+.PHONY: unit
+unit:
+
+	# Run Unit Tests
+	./node_modules/mocha/bin/mocha --reporter spec;
