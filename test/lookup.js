@@ -135,7 +135,7 @@ describe('#doSearch()', function() {
     it('returns an array of search results', function() {
         lookup.config.content_dir = __dirname +'/content/';
         var result = lookup.doSearch('example');
-        expect(result).to.have.length(2);
+        expect(result).to.have.length(3);
     });
     it('returns an empty array if nothing found', function() {
         lookup.config.content_dir = __dirname +'/content/';
