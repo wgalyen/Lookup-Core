@@ -1,6 +1,6 @@
 {
   "name": "lookup-core",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Core module for Lookup",
   "author": "Warren Galyen <wgalyen@bellhelmets.com>",
   "license": "MIT",
